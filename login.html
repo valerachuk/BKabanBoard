@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <title>Form</title>
     <link rel="stylesheet" href="form.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 </head>
 <body>
     <form class="form">
-        <h1 class="form_title">Вход</h1>
+        <img src="kabanLogo.png" alt="logo" id = "logo">
+        <h1 class="form_title">Sign in</h1>
+
 
         <div class="form_group">
             <input type="text" class="form_input" placeholder=" ">
@@ -16,10 +19,13 @@
 
         <div class="form_group">
             <input type="password" class="form_input" placeholder=" ">
-            <label class="form_label">Пароль</label>
+            <label class="form_label">Password</label>
         </div>
 
-        <button class="form_button">Войти</button>
+        <div id="button-container">
+            <button class="form_button disabled">Sign in</button>
+            <a href="register.html" id="another-option">Register</a>
+        </div>
 
     </form>
 </body>
