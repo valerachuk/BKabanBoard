@@ -72,6 +72,7 @@ body{
     background-color: #0071f0;
     transition: 0.3s;
     font-weight: bolder;
+    outline: none;
 }
 
 .form_button.disabled{
@@ -95,6 +96,7 @@ body{
     text-decoration: none;
     color: #0071f0;
     font-weight: bolder;
+    cursor: pointer;
 }
 
 #button-container{
