@@ -51,7 +51,10 @@ namespace BKabanApi
                 endpoints.MapControllers();
             });
 
-            app.Run(async ctx => await ctx.Response.SendFileAsync(@"wwwroot/index.html"));
+            app.Run(async ctx =>
+            {
+                await ctx.Response.SendFileAsync(@"wwwroot/index.html");
+            });
 
         }
     }
