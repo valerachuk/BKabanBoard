@@ -1,28 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BKabanApi.Models;
+﻿using BKabanApi.Models;
 using BKabanApi.Models.DB;
 using BKabanApi.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BKabanApi.Controllers
 {
-    [Route("api/column")]
+    [Route("api/task")]
     [ApiController]
-    public class ColumnController : ControllerBase
+    public class TaskController : ControllerBase
     {
-        private readonly IColumnRepository _columnRepository;
+        private readonly ITaskRepository _taskRepository;
 
-        public ColumnController(IColumnRepository columnRepository)
+        public TaskController(ITaskRepository taskRepository)
         {
-            _columnRepository = columnRepository;
+            _taskRepository = taskRepository;
         }
 
         [HttpPost]
-        public ActionResult CreateColumn(ColumnModel column)
+        public ActionResult CreateTask(TaskModelColumnLink task)
         {
             int? userId;
 
@@ -31,18 +26,18 @@ namespace BKabanApi.Controllers
                 return Unauthorized();
             }
 
-            int? columnId = _columnRepository.CreateColumn((int) userId, column);
+            int? taskId = _taskRepository.CreateTask((int) userId, task, task.ColumnId);
 
-            if (columnId == null)
+            if (taskId == null)
             {
-                return BadRequest();
+                return StatusCode(403);
             }
 
-            return Ok(new {id = columnId});
+            return Ok(new { id = taskId });
         }
 
         [HttpPut]
-        public ActionResult UpdateColumn(ColumnModel column)
+        public ActionResult UpdateTask(TaskModel task)
         {
             int? userId;
 
@@ -51,12 +46,12 @@ namespace BKabanApi.Controllers
                 return Unauthorized();
             }
 
-            if (column.Id == null)
+            if (task.Id == null || task.Name == null && task.Description == null)
             {
                 return BadRequest();
             }
 
-            bool result = _columnRepository.UpdateColumn((int)userId, column);
+            bool result = _taskRepository.UpdateTask((int) userId, task);
 
             if (result)
             {
@@ -66,9 +61,8 @@ namespace BKabanApi.Controllers
             return StatusCode(403);
         }
 
-
         [HttpDelete("{id}")]
-        public ActionResult DeleteColumn(int id)
+        public ActionResult DeleteTask(int id)
         {
             int? userId;
 
@@ -77,7 +71,7 @@ namespace BKabanApi.Controllers
                 return Unauthorized();
             }
 
-            bool result = _columnRepository.DeleteColumn((int)userId, id);
+            bool result = _taskRepository.DeleteTask((int)userId, id);
 
             if (result)
             {

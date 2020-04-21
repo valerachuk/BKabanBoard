@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BKabanApi.Models;
+using BKabanApi.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +11,7 @@ namespace BKabanApi.Controllers
 {
     [Route("api")]
     [ApiController]
-    public class UserAuthController : ControllerBase //authController 
+    public class UserAuthController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
 
@@ -19,37 +20,27 @@ namespace BKabanApi.Controllers
             _userRepository = userRepository;
         }
 
-        [HttpGet("id")]
-        public IActionResult getId()
+        [HttpGet("isLogged")]
+        public IActionResult IsLogged()
         {
-            int? userId;
-            if ((userId = HttpContext.Session.GetInt32("userId")) != null)
-            {
-                return Ok(userId);
-            }
-
-            return BadRequest();
+            int? userId = AuthHelper.GetUserId(HttpContext);
+            return Ok(new {isLogged = userId != null});
         }
 
-        [HttpPost("logout")]
+        [HttpDelete("logout")]
         public IActionResult Logout()
         {
-            HttpContext.Session.Remove("userId");
+            AuthHelper.LogOut(HttpContext);
             return Ok();
         }
 
         [HttpPost("login")]
-        public IActionResult Login(UserCredentials user)
+        public IActionResult Login(UserModel user)
         {
-            if (user == null)
-            {
-                return BadRequest();
-            }
-
             int? userId;
-            if ((userId = _userRepository.GetUserIdFullMatch(user.Email, user.Password)) != null)
+            if ((userId = _userRepository.GetUserIdFullMatch(user)) != null)
             {
-                HttpContext.Session.SetInt32("userId", (int)userId);
+                AuthHelper.AddUserToSession(HttpContext, (int) userId);
                 return Ok();
             }
 
@@ -57,20 +48,23 @@ namespace BKabanApi.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(UserCredentials user)
+        public IActionResult Register(UserModel user)
         {
-            if (user == null)
+            if (_userRepository.GetUserIdByUsername(user.Username) != null)
             {
-                return BadRequest();
+                return BadRequest("This username is already used!");
             }
 
-            if (_userRepository.GetIdByEmail(user.Email) != null)
+            int? userId = _userRepository.Create(user);
+
+            if (userId == null)
             {
-                return BadRequest("This email is already used!");
+                return StatusCode(500);
             }
 
-            _userRepository.Create(user);
-            return Login(user);
+            AuthHelper.AddUserToSession(HttpContext, (int) userId);
+
+            return Ok();
         }
     }
 }

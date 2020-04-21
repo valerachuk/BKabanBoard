@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using BKabanApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using BKabanApi.Models.DB;
+using BKabanApi.Utils;
 
 namespace BKabanApi.Controllers
 {
@@ -20,9 +17,39 @@ namespace BKabanApi.Controllers
         }
 
         [HttpGet]
-        public ActionResult getBoard()
+        public ActionResult GetBoard()
         {
-            return Ok(_fullBoardRepository.getUserBoard(1));
+            int? userId = AuthHelper.GetUserId(HttpContext);
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            return Ok(_fullBoardRepository.GetUserBoard((int)userId));
+
         }
+
+        [HttpPut("rename")]
+        public ActionResult RenameBoard(BoardModel board)
+        {
+            int? userId = AuthHelper.GetUserId(HttpContext);
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            int? result = _fullBoardRepository.UpdateBoardName((int)userId, board);
+
+            if (result == null)
+            {
+                return StatusCode(500);
+            }
+
+            return Ok();
+        }
+
+        
     }
 }

@@ -2,47 +2,55 @@
 using System.Linq;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BKabanApi.Models
 {
     public interface IUserRepository
     {
-        int? GetUserIdFullMatch(string email, string password);
-        int? GetIdByEmail(string email);
-        void Create(UserCredentials user);
+        int? GetUserIdFullMatch(UserModel user);
+        int? GetUserIdByUsername(string username);
+        int? Create(UserModel user);
     }
 
     public class UserRepository : IUserRepository
     {
         private readonly string _connectionString;
+        private readonly SHA1 _sha1 = SHA1.Create();
 
         public UserRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        public int? GetUserIdFullMatch(string email, string password)
+        private byte[] GetSha1FromString(string str)
         {
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                return db.Query<int?>("SELECT Id FROM UserTable WHERE Email = @email AND Password = @password", new {email, password}).FirstOrDefault();
-            }
+            return _sha1.ComputeHash(Encoding.Unicode.GetBytes(str));
         }
 
-        public int? GetIdByEmail(string email)
+        public int? GetUserIdFullMatch(UserModel user)
         {
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                return db.Query<int?>("SELECT Id FROM UserTable WHERE Email = @email", new { email }).FirstOrDefault();
-            }
+            using IDbConnection db = new SqlConnection(_connectionString);
+            return db.Query<int?>(@"SELECT Id
+                FROM UserTable
+                WHERE PasswordSha1 = @pwdHash AND Username = @username", new {username = user.Username, pwdHash = GetSha1FromString(user.Password)}).FirstOrDefault();
         }
 
-        public void Create(UserCredentials user)
+        public int? GetUserIdByUsername(string username)
         {
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                db.Execute("INSERT INTO UserTable (Email, Password) VALUES (@Email, @Password)", user);
-            }
+            using IDbConnection db = new SqlConnection(_connectionString);
+            return db.Query<int?>(@"SELECT Id
+                FROM UserTable
+                WHERE Username = @username", new { username }).FirstOrDefault();
+        }
+
+        public int? Create(UserModel user)
+        {
+            using IDbConnection db = new SqlConnection(_connectionString);
+            return db.Query<int?>(@"INSERT INTO UserTable (Username, PasswordSha1) 
+                OUTPUT INSERTED.Id
+                VALUES (@username, @pwdHash)", new { username = user.Username, pwdHash = GetSha1FromString(user.Password) }).FirstOrDefault();
         }
     }
 }
