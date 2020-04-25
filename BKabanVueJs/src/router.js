@@ -5,9 +5,6 @@ import apiClient from '@/services/apiService.js';
 
 Vue.use(VueRouter)
 
-//     // which is lazy-loaded when the route is visited.
-//     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
@@ -20,7 +17,7 @@ const router = new VueRouter({
     {
       path: '*',
       name: 'board',
-      component: () => import('./views/Board')
+      component: () => import('./views/MainView')
     }
   ],
 })

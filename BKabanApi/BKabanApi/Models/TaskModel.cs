@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BKabanApi.Models
 {
@@ -20,6 +16,6 @@ namespace BKabanApi.Models
     public class TaskModelColumnLink : TaskModel
     {
         [Required]
-        public int ColumnId { get; set; }
+        public int? ColumnId { get; set; }
     }
 }

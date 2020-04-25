@@ -46,12 +46,18 @@
                     return;
                 }
 
+                this.newName = this.newName.slice(0, 300);
+
                 this.task.name = this.newName;
 
                 apiClient.updateTask({id: this.task.id, name:this.task.name});
-                //+++apply to api+++ DONE
             },
             changeDescription(e){
+                
+                if (this.newDescription.length > 1000 && confirm('Description length is more than 1000 caracters! Do you want to cut?')) {
+                    this.newDescription = this.newDescription.slice(0, 1000);
+                }
+                
                 e.target.blur();
                 
                 if (this.newDescription === this.task.description) {
@@ -61,7 +67,6 @@
                 this.task.description = this.newDescription;
 
                 apiClient.updateTask({id: this.task.id, description:this.task.description});
-                //+++apply to api+++
             }
         },
         created(){

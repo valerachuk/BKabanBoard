@@ -9,7 +9,7 @@ namespace BKabanApi.Models.DB
 {
     public interface ITaskRepository
     {
-        int? CreateTask(int userId, TaskModel task, int columnId);
+        int? CreateTask(int userId, TaskModelColumnLink task);
         bool UpdateTask(int userId, TaskModel task);
         bool DeleteTask(int userId, int id);
     }
@@ -23,9 +23,10 @@ namespace BKabanApi.Models.DB
             _connectionString = connectionString;
         }
 
-        private bool IsAllowed(IDbConnection db, int userId, int taskId)
+        private static bool IsAllowed(IDbConnection db, int userId, int taskId)
         {
-            return db.Query(@"SELECT T.Id
+            return db.Query(
+                @"SELECT T.Id
                 FROM UserTable AS U
                 JOIN BoardTable AS B ON B.UserId=U.Id
                 JOIN ColumnTable AS C ON C.BoardId=B.Id
@@ -33,17 +34,17 @@ namespace BKabanApi.Models.DB
                 WHERE U.Id = @userId AND T.Id=@taskId", new {userId, taskId}).Any();
         }
 
-        public int? CreateTask(int userId, TaskModel task, int columnId)
+        public int? CreateTask(int userId, TaskModelColumnLink task)
         {
             using IDbConnection db = new SqlConnection(_connectionString);
-            if (!ColumnRepository.IsAllowed(db, userId, columnId))
+            if (!ColumnRepository.IsAllowed(db, userId, (int)task.ColumnId))
             {
                 return null;
             }
 
             return db.Query<int?>(@"INSERT INTO TaskTable(Name, Description, ColumnId) 
                     OUTPUT INSERTED.Id VALUES
-                    (@taskName, @taskDescription, @columnId);", new { taskName = task.Name, taskDescription = task.Description, columnId}).FirstOrDefault();
+                    (@taskName, @taskDescription, @columnId);", new { taskName = task.Name, taskDescription = task.Description, columnId = task.ColumnId}).FirstOrDefault();
         }
 
         public bool UpdateTask(int userId, TaskModel task)

@@ -8,28 +8,32 @@
                 @keyup.enter="renameBoard($event)" v-if="isBoardAvailable">
             <img src="@/assets/kaban-logo.png" class="logo">
         </div>
-        <div class="board" v-if="isBoardAvailable">
-            <Column v-for="(column, index) of board.columns" :column="column" :key="column.id || index" :board="board"
+        <div class="board">
+            <Column v-for="(column, index) of board.columns" :column="column" :key="column.id || index + column.name" :board="board"
                 @open-modal-task="e => modalTaskObj = e" />
             <div class="column">
                 <input type="text" class="new-column" placeholder="+ Add another column" v-model="newColumnName"
-                    @keyup.enter="addColumn" @change="addColumn">
+                    @keyup.enter="addColumn" @change="addColumn" v-if="isBoardAvailable">
             </div>
         </div>
-        <TaskEditModal v-if="modalTaskObj" :task="modalTaskObj" @close-modal-task="modalTaskObj = null" />
+
     </div>
 </template>
 
 <script>
-    // import boardMock from '@/debug/boardMock.js';
     import Column from '@/components/Column.vue';
-    import TaskEditModal from '@/components/TaskEditModal.vue';
     import apiClient from '@/services/apiService.js';
+    import { eventBus } from '@/main.js';
 
     export default {
+        props:{
+            board:{
+                type: Object,
+                required: true
+            }
+        },
         components: {
             Column,
-            TaskEditModal
         },
         methods: {
             addColumn() {
@@ -37,14 +41,13 @@
                     return;
                 }
                 const newColumn = {
-                    name: this.newColumnName,
+                    name: this.newColumnName.slice(0, 100),
                     tasks: [],
                 };
                 this.board.columns.push(newColumn);
                 this.newColumnName = '';
 
-                apiClient.createColumn(newColumn, () => this.$forceUpdate());
-                //+++apply changes to API +++ DONE
+                apiClient.createColumn(newColumn, this.board.id, () => this.$forceUpdate());
             },
             renameBoard(e) {
                 e.target.blur();
@@ -58,10 +61,13 @@
                     return;
                 }
 
+                this.newBoardName = this.newBoardName.slice(0, 100);
+
                 this.board.name = this.newBoardName;
 
+                eventBus.$emit('rename-board', this.board);
+
                 apiClient.updateBoardName(this.board);
-                //+++apply changes to API +++ DONE
             },
             logout(){
                 apiClient.logout(() => this.$router.push({name: 'login'}))
@@ -77,15 +83,10 @@
                 this.newBoardName = this.board.name;
             }
         },
-        created() { //on api load DONE
-            apiClient.getBoard(resp => this.board = resp.data);
-        },
         data() {
             return {
-                board: {},
                 newColumnName: '',
-                newBoardName: '',
-                modalTaskObj: null
+                newBoardName: ''
             }
         },
     }
@@ -112,11 +113,15 @@
         border-radius: 3px;
         width: calc(100% - 16px);
         box-sizing: border-box;
+        cursor: pointer;
+    }
+
+    .new-column:focus{
+        cursor: text;
     }
 
     .board-header {
         background-color: #0067A3;
-        width: 100%;
         height: 70px;
         display: flex;
         align-items: center;
@@ -154,7 +159,7 @@
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        width: 70%;
+        width: calc(100% - 300px);
         height: 50px;
         text-align: center;
         color: #fff;

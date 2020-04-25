@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-    // baseURL: "http://localhost:58813/",
+    // baseURL: "http://localhost:5000",
     withCredentials: true,
     headers:{
         Accept: "application/json",
@@ -10,17 +10,33 @@ const apiClient = axios.create({
 });
 
 function onError(err){
+    alert('API ERROR: ' + err.message);
     console.log('API ERROR: ' + err.message);
 }
 
 export default {
-    getBoard(e){
-        apiClient.get('/api/board')
-            .then(resp => e(resp))
+    getUserData(onLoad){
+        apiClient.get('api/userData')
+            .then(resp => onLoad(resp))
+            .catch(err => onError(err));
+    },
+
+    createBoard(board, onLoad){
+        apiClient.post('api/board', { id:board.id, name:board.name })
+            .then(resp => onLoad(resp))
+            .catch(err => onError(err));
+    },
+    getBoard(board, onLoad){
+        apiClient.get(`/api/board/${board.id}`)
+            .then(resp => onLoad(resp))
             .catch(err => onError(err));
     },
     updateBoardName(board){
-        apiClient.put('/api/board/rename', { name: board.name })
+        apiClient.put('/api/board', { name: board.name, id: board.id })
+            .catch(err => onError(err));
+    },
+    deleteBoard(board){
+        apiClient.delete(`/api/board/${board.id}`)
             .catch(err => onError(err));
     },
 
@@ -41,8 +57,8 @@ export default {
             .catch(err => onError(err));
     },
 
-    createColumn(column, okCb){
-        apiClient.post('/api/column', {name: column.name})
+    createColumn(column, boardId, okCb){
+        apiClient.post('/api/column', {name: column.name, boardId})
             .then(resp => {
                 column.id = resp.data.id;
                 okCb(resp);
@@ -69,24 +85,18 @@ export default {
             .then(resp => okCb(resp))
             .catch(err => {
                 errorCb(err);
-                onError(err);
+                //onError(err);
             });
     },
-    logout(okCb, errorCb){
+    logout(okCb){
         apiClient.delete('api/logout')
             .then(resp => okCb(resp))
-            .catch(err => {
-                errorCb(err);
-                onError(err);
-            });
+            .catch(err => onError(err));
     },
-    register(user, okCb, errorCb){
+    register(user, okCb){
         apiClient.post('api/register', user)
             .then(resp => okCb(resp))
-            .catch(err => {
-                errorCb(err);
-                onError(err);
-            });
+            .catch(err => onError(err));
     }
     
 }

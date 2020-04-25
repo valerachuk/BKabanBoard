@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BKabanApi.Models;
+﻿using BKabanApi.Models;
 using BKabanApi.Models.DB;
 using BKabanApi.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BKabanApi.Controllers
@@ -22,7 +17,7 @@ namespace BKabanApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateColumn(ColumnModel column)
+        public ActionResult CreateColumn(ColumnModelBoardLink column)
         {
             int? userId;
 
@@ -35,7 +30,7 @@ namespace BKabanApi.Controllers
 
             if (columnId == null)
             {
-                return BadRequest();
+                return StatusCode(403);
             }
 
             return Ok(new {id = columnId});

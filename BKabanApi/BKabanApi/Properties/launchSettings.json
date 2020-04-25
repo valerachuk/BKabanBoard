@@ -19,7 +19,7 @@
     },
     "BKabanApi": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "index.html",
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {

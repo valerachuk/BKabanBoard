@@ -7,8 +7,7 @@
             <input class="name-edit" v-model="newColumnName" @change="renameColumn($event)"
                 @keyup.enter="renameColumn($event)" />
         </div>
-        <Task v-for="(task, index) of column.tasks" :key="task.id || index" :task="task" :column="column"
-            @open-modal-task=" e => $emit('open-modal-task', e)" />
+        <Task v-for="(task, index) of column.tasks" :key="task.id || index + task.name" :task="task" :column="column"/>
         <input class="add-task" placeholder="+ Add another task" v-model="newTaskName" @keyup.enter="addTask"
             @change="addTask" v-if="column.id" />
     </div>
@@ -37,18 +36,21 @@
                     return;
                 }
                 const newTask = {
-                    name: this.newTaskName,
+                    name: this.newTaskName.slice(0, 300),
                     description: '',
                 };
                 this.column.tasks.push(newTask);
                 this.newTaskName = '';
 
                 apiClient.createTask(newTask, this.column.id, () => this.$forceUpdate());
-                //+++apply changes to API +++ DONE
             },
             deleteColumn() {
+
+                if (!confirm(`Delete ${this.column.name} ?`)) {
+                    return;
+                }
+
                 apiClient.deleteColumn(this.column);
-                //+++apply changes to API +++ DONE
                 
                 this.board.columns = this.board.columns.filter(col => col !== this.column);
             },
@@ -64,10 +66,11 @@
                     return;
                 }
 
+                this.newColumnName = this.newColumnName.slice(0, 100);
+
                 this.column.name = this.newColumnName;
 
                 apiClient.updateColumn(this.column);
-                //+++apply changes to API +++ DONE
             }
         },
         created() {
@@ -120,7 +123,7 @@
         margin: 6px 8px;
         box-sizing: border-box;
         cursor: pointer;
-        border: 2px solid red;
+        border: 2px solid transparent;
     }
 
     .name-edit:focus {

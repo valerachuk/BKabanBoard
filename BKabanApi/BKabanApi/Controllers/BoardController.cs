@@ -9,15 +9,15 @@ namespace BKabanApi.Controllers
     [ApiController]
     public class BoardController : ControllerBase
     {
-        private readonly IFullBoardRepository _fullBoardRepository;
+        private readonly IBoardRepository _boardRepository;
 
-        public BoardController(IFullBoardRepository fullBoardRepository)
+        public BoardController(IBoardRepository boardRepository)
         {
-            _fullBoardRepository = fullBoardRepository;
+            _boardRepository = boardRepository;
         }
 
-        [HttpGet]
-        public ActionResult GetBoard()
+        [HttpPost]
+        public ActionResult CreateBoard(BoardModel board)
         {
             int? userId = AuthHelper.GetUserId(HttpContext);
 
@@ -26,30 +26,80 @@ namespace BKabanApi.Controllers
                 return Unauthorized();
             }
 
-            return Ok(_fullBoardRepository.GetUserBoard((int)userId));
+            int? insertedId = _boardRepository.CreateBoard((int) userId, board);
+
+            if (insertedId == null)
+            {
+                return StatusCode(403);
+            }
+
+            return Ok(new {id = insertedId});
 
         }
 
-        [HttpPut("rename")]
+        [HttpGet("{id}")]
+        public ActionResult GetBoard(int id)
+        {
+            int? userId = AuthHelper.GetUserId(HttpContext);
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var board = _boardRepository.GetFullBoard((int) userId, id);
+
+            if (board == null)
+            {
+                return StatusCode(403);
+            }
+
+            return Ok(board);
+        }
+
+        [HttpPut]
         public ActionResult RenameBoard(BoardModel board)
         {
             int? userId = AuthHelper.GetUserId(HttpContext);
 
+            if (board.Id == null)
+            {
+                return BadRequest();
+            }
+
             if (userId == null)
             {
                 return Unauthorized();
             }
 
-            int? result = _fullBoardRepository.UpdateBoardName((int)userId, board);
+            bool result = _boardRepository.UpdateBoardName((int) userId, board);
 
-            if (result == null)
+            if (result)
             {
-                return StatusCode(500);
+                return Ok();
             }
 
-            return Ok();
+            return StatusCode(403);
         }
 
-        
+        [HttpDelete("{id}")]
+        public ActionResult DeleteBoard(int id)
+        {
+            int? userId = AuthHelper.GetUserId(HttpContext);
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            bool result = _boardRepository.DeleteBoard((int)userId, id);
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return StatusCode(403);
+        }
     }
 }

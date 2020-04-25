@@ -14,6 +14,7 @@
 
 <script>
     import apiClient from '@/services/apiService.js';
+    import { eventBus }  from '@/main.js';
     export default {
         props: {
             task: {
@@ -38,7 +39,6 @@
         methods: {
             deleteTask(){
                 apiClient.deleteTask(this.task);
-                //+++apply changes to API +++ DONE
 
                 this.column.tasks = this.column.tasks.filter(task => this.task !== task);
             },
@@ -49,9 +49,10 @@
                  e.target.classList.contains('cross-container')) {
                     return;
                 }
-                this.$emit('open-modal-task', this.task);
+
+                eventBus.$emit('open-modal-task', this.task);
             }
-        }
+        },
     }
 </script>
 
@@ -98,7 +99,6 @@
 
     .cross-container>img {
         display: none;
-        fill: orangered;
     }
 
     .cross-container:hover{

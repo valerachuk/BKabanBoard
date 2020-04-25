@@ -4,12 +4,21 @@
         <img src="@/assets/kaban-logo.png" alt="logo" id="logo">
         <h1 class="form_title">{{mainAction}}</h1>
         <div class="form_group">
-            <input type="text" class="form_input" placeholder=" " v-model="username">
+            <input type="text" class="form_input" placeholder=" " v-model="username" @input="isUsernameTipHilighted = false; isInvalidPwdOrUn = false">
             <label class="form_label">Email</label>
+            <div class="input-tip" :class="{hilighted: isUsernameTipHilighted}"  v-if="!this.isSignIn">
+                Username length must be more than 2 and less than 20 characters
+            </div>
         </div>
         <div class="form_group">
-            <input type="password" class="form_input" placeholder=" " v-model="password">
+            <input type="password" class="form_input" placeholder=" " v-model="password" @input="isPasswordTipHilighted = false; isInvalidPwdOrUn = false">
             <label class="form_label">Password</label>
+            <div class="input-tip" :class="{hilighted: isPasswordTipHilighted}" v-if="!this.isSignIn">
+                Password length must be more than 6 and less than 100 characters
+            </div>
+            <div class="input-tip hilighted" v-if="this.isSignIn && isInvalidPwdOrUn">
+                Invalid username or password
+            </div>
         </div>
         <div id="button-container">
             <button :class="{disabled: btnDisabled}" class="form_button"
@@ -27,8 +36,11 @@
         data() {
             return {
                 isSignIn: true,
-                username: undefined,
-                password: undefined,
+                username: "",
+                password: "",
+                isUsernameTipHilighted: false,
+                isPasswordTipHilighted: false,
+                isInvalidPwdOrUn: false,
             };
         },
         computed: {
@@ -38,24 +50,40 @@
             optionAction: function () {
                 return !this.isSignIn ? "Sign in" : "Sign up";
             },
+            regPwdCorrect(){
+                return this.password.length >= 6 && this.password.length <= 100;
+            },
+            regUsernameCorrect(){
+                return this.username.length >= 2 && this.username.length <= 20;
+            },
             btnDisabled: function () {
-                return !(this.username && this.password && this.password.length >= 6 && this.username.length >= 2 &&
-                    this.password.length <= 100 && this.username.length <= 20);
+                return this.username.length === 0 || this.password.length === 0;
             },
         },
         methods: {
             processClick: function () {
+
+                if (this.btnDisabled) {
+                    return;
+                }
+
+                this.isUsernameTipHilighted = !this.regUsernameCorrect;
+                this.isPasswordTipHilighted = !this.regPwdCorrect;
+
+                if (!this.isSignIn && (!this.regUsernameCorrect || !this.regPwdCorrect)) {
+                    return;
+                }
+
                 const user = {
                     username: this.username,
                     password: this.password
                 };
                 const goMain = () => this.$router.push({name: 'board'});
-                const alertErr = (err) => alert(err.message);
                 if (this.isSignIn) {
-                    apiClient.login(user, goMain, alertErr);
+                    apiClient.login(user, goMain, () => this.isInvalidPwdOrUn = true);
                 }
                 else{
-                    apiClient.register(user, goMain, alertErr);
+                    apiClient.register(user, goMain);
                 }
             }
         }
@@ -81,13 +109,11 @@
         padding: 32px;
         border-radius: 10px;
         box-shadow: 0 4px 16px #cccccc;
-        font-family: sans-serif;
         letter-spacing: 1px;
     }
 
     .form_input,
     .form_button {
-        font-family: sans-serif;
         letter-spacing: 1px;
         font-size: 16px;
     }
@@ -98,6 +124,7 @@
         margin-bottom: 32px;
         margin-top: 16px;
         font-weight: normal;
+        font-size: 32px;
     }
 
     .form_group {
@@ -128,6 +155,16 @@
         border-bottom: 1px solid #1a738a;
     }
 
+    .input-tip{
+        margin-top: 3px;
+        color:rgb(126, 126, 126)
+    }
+
+    .input-tip.hilighted{
+        color:rgb(214, 0, 0);
+        /* font-weight: 600; */
+    }
+
     .form_button {
         padding: 10px 20px;
         border: none;
@@ -137,10 +174,12 @@
         transition: 0.3s;
         font-weight: bolder;
         outline: none;
+        cursor: pointer;
     }
 
     .form_button.disabled {
         background-color: rgba(135, 190, 253, 0.7);
+        cursor: default;
     }
 
     .form_button:focus:not(.disabled),

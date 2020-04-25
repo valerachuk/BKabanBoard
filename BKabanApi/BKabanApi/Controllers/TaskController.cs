@@ -26,7 +26,7 @@ namespace BKabanApi.Controllers
                 return Unauthorized();
             }
 
-            int? taskId = _taskRepository.CreateTask((int) userId, task, task.ColumnId);
+            int? taskId = _taskRepository.CreateTask((int) userId, task);
 
             if (taskId == null)
             {
