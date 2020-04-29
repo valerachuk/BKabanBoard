@@ -2,8 +2,8 @@ import axios from 'axios';
 import router from '@/router';
 
 const apiClient = axios.create({
-    // baseURL: "http://localhost:5000",
-    baseURL: "https://bkaban.azurewebsites.net",
+    baseURL: "http://localhost:5000",
+    // baseURL: "https://bkaban.azurewebsites.net",
     withCredentials: true,
     headers:{
         Accept: "application/json",
