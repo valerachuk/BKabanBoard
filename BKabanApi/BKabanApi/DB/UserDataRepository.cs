@@ -25,9 +25,10 @@ namespace BKabanApi.Models
             {
                 Boards = db.Query<BoardModel>(
                     @"SELECT B.Id, B.Name
-                FROM BoardTable AS B
-                JOIN UserTable AS U ON U.Id = B.UserId
-                WHERE U.Id = @userId", new {userId})
+                    FROM BoardTable AS B
+                    JOIN UserTable AS U ON U.Id = B.UserId
+                    WHERE U.Id = @userId
+                    ORDER BY Position", new {userId})
             };
 
             return userData;

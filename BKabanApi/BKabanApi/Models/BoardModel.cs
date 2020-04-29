@@ -12,4 +12,11 @@ namespace BKabanApi.Models
 
         public IEnumerable<ColumnModel> Columns { get; set; }
     }
+
+    public class BoardModelWithPosition : BoardModel
+    {
+        [Required]
+        public int? Position { get; set; }
+    }
+
 }

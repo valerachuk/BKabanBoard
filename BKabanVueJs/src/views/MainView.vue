@@ -4,9 +4,9 @@
             <div class="list-title-wrapper">
                 <div class="list-title">Your boards:</div>
             </div>
-            <div class="board-list-wrapper" v-if="isDataAvailable">
+            <draggable class="board-list-wrapper" v-if="isDataAvailable" :list="userData.boards" handle=".handle" @change="reorderBoard">
                 <div v-for="(board, index) of userData.boards" :key="board.id || index + board.name"
-                    class="name-container" @click="openBoard($event, board)">
+                    class="name-container" @click="openBoard($event, board)" :class="{handle: board.id}">
                     <div class="cross-container" v-if="board.id" @click="deleteBoard(board)">
                         <img src="@/assets/icons/trash.svg" width="100%" class='cross-trash' />
                     </div>
@@ -15,7 +15,7 @@
                     </div>
                 </div>
                 <input type="text" placeholder="+ Add another board" class="add-new-board" v-model="newBoardName" @change="createBoard" @keyup.enter="createBoard">
-            </div>
+            </draggable>
         </div>
         <Board class="board-wrapper" :board="currentBoard"/>
         <TaskEditModal v-if="modalTaskObj" :task="modalTaskObj" @close-modal-task="modalTaskObj = null" />
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+    import draggable from 'vuedraggable';
     import apiClient from '@/services/apiService.js';
     import Board from '@/views/Board.vue'; 
     import TaskEditModal from '@/components/TaskEditModal.vue';
@@ -31,7 +32,8 @@
     export default {
         components: {
             Board,
-            TaskEditModal
+            TaskEditModal,
+            draggable
         },
         data() {
             return {
@@ -91,8 +93,13 @@
 
                 apiClient.createBoard(newBoardCard, resp => {
                     newBoardCard.id = resp.data.id;
+                    this.modalTaskObj = null;
+                    this.currentBoard = {id: newBoardCard.id, name: newBoardCard.name, columns: []};
                     this.$forceUpdate();
                 });
+            },
+            reorderBoard(e){
+                apiClient.updateBoardOrder(e.moved.element, e.moved.newIndex);
             }
         }
     }

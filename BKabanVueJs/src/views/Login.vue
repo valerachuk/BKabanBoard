@@ -4,8 +4,8 @@
         <img src="@/assets/kaban-logo.png" alt="logo" id="logo">
         <h1 class="form_title">{{mainAction}}</h1>
         <div class="form_group">
-            <input type="text" class="form_input" placeholder=" " v-model="username" @input="isUsernameTipHilighted = false; isInvalidPwdOrUn = false">
-            <label class="form_label">Email</label>
+            <input type="text" class="form_input" placeholder=" " v-model="username" @input="isUsernameTipHilighted = false; isInvalidPwdOrUn = false; isInvalidRegister = false">
+            <label class="form_label">Username</label>
             <div class="input-tip" :class="{hilighted: isUsernameTipHilighted}"  v-if="!this.isSignIn">
                 Username length must be more than 2 and less than 20 characters
             </div>
@@ -18,6 +18,9 @@
             </div>
             <div class="input-tip hilighted" v-if="this.isSignIn && isInvalidPwdOrUn">
                 Invalid username or password
+            </div>
+            <div class="input-tip hilighted" v-if="!this.isSignIn && isInvalidRegister">
+                Try another username
             </div>
         </div>
         <div id="button-container">
@@ -41,6 +44,7 @@
                 isUsernameTipHilighted: false,
                 isPasswordTipHilighted: false,
                 isInvalidPwdOrUn: false,
+                isInvalidRegister: false
             };
         },
         computed: {
@@ -83,7 +87,7 @@
                     apiClient.login(user, goMain, () => this.isInvalidPwdOrUn = true);
                 }
                 else{
-                    apiClient.register(user, goMain);
+                    apiClient.register(user, goMain, () => this.isInvalidRegister = true);
                 }
             }
         }

@@ -2,6 +2,7 @@ import axios from "axios";
 
 const apiClient = axios.create({
     // baseURL: "http://localhost:5000",
+    baseURL: "https://bkaban.azurewebsites.net",
     withCredentials: true,
     headers:{
         Accept: "application/json",
@@ -35,6 +36,10 @@ export default {
         apiClient.put('/api/board', { name: board.name, id: board.id })
             .catch(err => onError(err));
     },
+    updateBoardOrder(board, newIndex){
+        apiClient.put('/api/board/reorder', {id: board.id, position: newIndex})
+            .catch(err => onError(err));
+    },
     deleteBoard(board){
         apiClient.delete(`/api/board/${board.id}`)
             .catch(err => onError(err));
@@ -52,6 +57,10 @@ export default {
         apiClient.put('/api/task', task)
             .catch(err => onError(err));
     },
+    updateTaskOrder(task, newIndex, newColumnId){
+        apiClient.put('/api/task/reorder', {id: task.id, position: newIndex, newColumnId})
+            .catch(err => onError(err));
+    },
     deleteTask(task){
         apiClient.delete(`/api/task/${task.id}`)
             .catch(err => onError(err));
@@ -67,6 +76,10 @@ export default {
     },
     updateColumn(column){
         apiClient.put('/api/column', column)
+            .catch(err => onError(err));
+    },
+    updateColumnOrder(column, newIndex){
+        apiClient.put('/api/column/reorder', {id: column.id, position: newIndex})
             .catch(err => onError(err));
     },
     deleteColumn(column){
@@ -93,10 +106,13 @@ export default {
             .then(resp => okCb(resp))
             .catch(err => onError(err));
     },
-    register(user, okCb){
+    register(user, okCb, errorCb){
         apiClient.post('api/register', user)
             .then(resp => okCb(resp))
-            .catch(err => onError(err));
+            .catch(err => {
+                // onError(err);
+                errorCb(err);
+            });
     }
     
 }

@@ -82,6 +82,30 @@ namespace BKabanApi.Controllers
             return StatusCode(403);
         }
 
+        [HttpPut("reorder")]
+        public ActionResult MoveBoard(BoardModelWithPosition board)
+        {
+            int? userId = AuthHelper.GetUserId(HttpContext);
+
+            if (board.Id == null)
+            {
+                return BadRequest();
+            }
+
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            bool result = _boardRepository.UpdateBoardPosition((int) userId, board);
+            if (result)
+            {
+                return Ok();
+            }
+
+            return StatusCode(403);
+        }
+
         [HttpDelete("{id}")]
         public ActionResult DeleteBoard(int id)
         {

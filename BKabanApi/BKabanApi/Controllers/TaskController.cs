@@ -61,6 +61,31 @@ namespace BKabanApi.Controllers
             return StatusCode(403);
         }
 
+        [HttpPut("reorder")]
+        public ActionResult MoveTask(TaskModelWithPositionAndNewColumn task)
+        {
+            int? userId;
+
+            if ((userId = AuthHelper.GetUserId(HttpContext)) == null)
+            {
+                return Unauthorized();
+            }
+
+            if (task.Id == null)
+            {
+                return BadRequest();
+            }
+
+            bool result = _taskRepository.UpdateTaskPositionAndColumn((int)userId, task);
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return StatusCode(403);
+        }
+
         [HttpDelete("{id}")]
         public ActionResult DeleteTask(int id)
         {

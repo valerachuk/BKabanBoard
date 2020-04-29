@@ -18,4 +18,10 @@ namespace BKabanApi.Models
         [Required]
         public int? BoardId { get; set; }
     }
+
+    public class ColumnModelWithPosition : ColumnModel
+    {
+        [Required]
+        public int? Position { get; set; }
+    }
 }

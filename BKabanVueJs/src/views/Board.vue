@@ -9,8 +9,10 @@
             <img src="@/assets/kaban-logo.png" class="logo">
         </div>
         <div class="board">
-            <Column v-for="(column, index) of board.columns" :column="column" :key="column.id || index + column.name" :board="board"
-                @open-modal-task="e => modalTaskObj = e" />
+            <draggable class="column-draggable-wrapper" :list="board.columns" handle=".handle" @change="reorderColumn">
+                <Column v-for="(column, index) of board.columns" :column="column" :key="column.id || index + column.name" :board="board"
+                    @open-modal-task="e => modalTaskObj = e" :class="{handle: column.id}" />
+            </draggable>
             <div class="column">
                 <input type="text" class="new-column" placeholder="+ Add another column" v-model="newColumnName"
                     @keyup.enter="addColumn" @change="addColumn" v-if="isBoardAvailable">
@@ -21,6 +23,7 @@
 </template>
 
 <script>
+    import draggable from 'vuedraggable';
     import Column from '@/components/Column.vue';
     import apiClient from '@/services/apiService.js';
     import { eventBus } from '@/main.js';
@@ -34,6 +37,7 @@
         },
         components: {
             Column,
+            draggable
         },
         methods: {
             addColumn() {
@@ -69,6 +73,9 @@
 
                 apiClient.updateBoardName(this.board);
             },
+            reorderColumn(e){
+                apiClient.updateColumnOrder(e.moved.element, e.moved.newIndex);
+            },
             logout(){
                 apiClient.logout(() => this.$router.push({name: 'login'}))
             }
@@ -102,6 +109,11 @@
         overflow-y: hidden;
         overflow-x: auto;
         padding-top: 4px;
+    }
+
+    .column-draggable-wrapper{
+        display: flex;
+        align-items: flex-start;
     }
 
     .new-column {

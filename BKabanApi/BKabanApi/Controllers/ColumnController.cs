@@ -61,6 +61,31 @@ namespace BKabanApi.Controllers
             return StatusCode(403);
         }
 
+        [HttpPut("reorder")]
+        public ActionResult MoveColumn(ColumnModelWithPosition column)
+        {
+            int? userId;
+
+            if ((userId = AuthHelper.GetUserId(HttpContext)) == null)
+            {
+                return Unauthorized();
+            }
+
+            if (column.Id == null)
+            {
+                return BadRequest();
+            }
+
+            bool result = _columnRepository.UpdateColumnPosition((int)userId, column);
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return StatusCode(403);
+        }
+
 
         [HttpDelete("{id}")]
         public ActionResult DeleteColumn(int id)

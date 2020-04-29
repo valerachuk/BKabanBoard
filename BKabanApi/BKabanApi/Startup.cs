@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using BKabanApi.Models;
 using BKabanApi.Models.DB;
 using Microsoft.AspNetCore.Builder;
@@ -12,31 +13,38 @@ namespace BKabanApi
 {
     public class Startup
     {
-        //readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         private readonly string _sqlConnectionString;
 
         public Startup(IConfiguration configuration)
         {
-            //_sqlConnectionString = configuration.GetConnectionString("localPC");
-            _sqlConnectionString = configuration.GetConnectionString("DefaultConnection");
+            _sqlConnectionString = configuration.GetConnectionString("BKabanConnectionString");
+            _sqlConnectionString ??= configuration.GetConnectionString("localPC");
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddCors(options =>
-            //{
-            //    options.AddPolicy(name: MyAllowSpecificOrigins,
-            //        builder =>
-            //        {
-            //            builder.WithOrigins("http://localhost:8080")
-            //                .AllowCredentials()
-            //                .AllowAnyHeader()
-            //                .AllowAnyMethod()
-            //                .SetIsOriginAllowedToAllowWildcardSubdomains(); });
-            //});
+            string myCORSOrigin = "https://kban.tk";
+
+#if DEBUG
+            myCORSOrigin = "http://localhost:8080";
+#endif
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.WithOrigins(myCORSOrigin)
+                            .AllowCredentials()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .SetIsOriginAllowedToAllowWildcardSubdomains();
+                    });
+            });
 
             services.AddControllers();
-            
+
             services.AddDistributedMemoryCache();
             services.AddSession(opt =>
             {
@@ -44,6 +52,7 @@ namespace BKabanApi
                 opt.Cookie.HttpOnly = true;
                 opt.Cookie.Name = ".BKaban.Session";
                 opt.IdleTimeout = TimeSpan.FromMinutes(10);
+                opt.Cookie.SameSite = SameSiteMode.None;
             });
 
             services.AddTransient<IUserRepository, UserRepository>(provider => new UserRepository(_sqlConnectionString));
@@ -61,19 +70,19 @@ namespace BKabanApi
             }
 
             app.UseSession();
-            app.UseStaticFiles();
             app.UseRouting();
 
-            //app.UseCors(MyAllowSpecificOrigins);
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
 
-            app.Run(async ctx =>
+            app.Run(ctx =>
             {
-                await ctx.Response.SendFileAsync(@"wwwroot/index.html");
+                ctx.Response.Redirect("https://kban.tk", true);
+                return Task.CompletedTask;
             });
 
         }

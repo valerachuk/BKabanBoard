@@ -18,4 +18,13 @@ namespace BKabanApi.Models
         [Required]
         public int? ColumnId { get; set; }
     }
+
+    public class TaskModelWithPositionAndNewColumn : TaskModel
+    {
+        [Required]
+        public int? NewColumnId { get; set; }
+
+        [Required]
+        public int? Position { get; set; }
+    }
 }

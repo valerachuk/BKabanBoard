@@ -7,18 +7,22 @@
             <input class="name-edit" v-model="newColumnName" @change="renameColumn($event)"
                 @keyup.enter="renameColumn($event)" />
         </div>
-        <Task v-for="(task, index) of column.tasks" :key="task.id || index + task.name" :task="task" :column="column"/>
+        <draggable class="task-draggable-wrapper" group="tasks-draggable" :list="column.tasks" handle=".handle" @change="reorderTask">
+            <Task v-for="(task, index) of column.tasks" :key="task.id || index + task.name" :task="task" :column="column" :class="{handle: task.id}"/>
+        </draggable>
         <input class="add-task" placeholder="+ Add another task" v-model="newTaskName" @keyup.enter="addTask"
             @change="addTask" v-if="column.id" />
     </div>
 </template>
 
 <script>
+    import draggable from 'vuedraggable';
     import apiClient from '@/services/apiService.js';
     import Task from '@/components/Task.vue';
     export default {
         components: {
             Task,
+            draggable
         },
         props: {
             column: {
@@ -71,7 +75,23 @@
                 this.column.name = this.newColumnName;
 
                 apiClient.updateColumn(this.column);
-            }
+            },
+            reorderTask(e){
+                function getColumnIndex(task, columns){
+                    for (const column of columns) {
+                        if(column.tasks.includes(task)){
+                            return column.id;
+                        }
+                    }
+                }
+
+                if(e.removed){
+                    return;
+                }
+
+                const eventObj = e.moved ? e.moved : e.added;
+                apiClient.updateTaskOrder(eventObj.element, eventObj.newIndex, getColumnIndex(eventObj.element, this.board.columns));
+            },
         },
         created() {
             this.newColumnName = this.column.name;
