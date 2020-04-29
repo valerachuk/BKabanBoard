@@ -1,4 +1,5 @@
-import axios from "axios";
+import axios from 'axios';
+import router from '@/router';
 
 const apiClient = axios.create({
     // baseURL: "http://localhost:5000",
@@ -11,6 +12,11 @@ const apiClient = axios.create({
 });
 
 function onError(err){
+    if (err.response && err.response.status === 401){
+        router.push({name: 'login'});
+        return;
+    }
+    
     alert('API ERROR: ' + err.message);
     console.log('API ERROR: ' + err.message);
 }
