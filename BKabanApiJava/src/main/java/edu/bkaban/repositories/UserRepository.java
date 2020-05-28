@@ -35,8 +35,8 @@ public class UserRepository {
         byte[] salt;
         try (var conn = DbService.getConnection(); var stmt = conn.prepareStatement(GetSaltSql)) {
             stmt.setString(1, user.getUsername());
-            stmt.execute();
-            var rset = stmt.getResultSet();
+
+            var rset = stmt.executeQuery();
             if (!rset.next()){
                 return null;
             }
@@ -51,8 +51,8 @@ public class UserRepository {
         try (var conn = DbService.getConnection(); var stmt = conn.prepareStatement(GetUserIdFullMatchSql)) {
             stmt.setBytes(1, pwdhash);
             stmt.setString(2, user.getUsername());
-            stmt.execute();
-            var rset = stmt.getResultSet();
+
+            var rset = stmt.executeQuery();
             if (!rset.next()){
                 return null;
             }
@@ -64,8 +64,8 @@ public class UserRepository {
     public Integer getUserIdByUsername(String username) throws SQLException {
         try (var conn = DbService.getConnection(); var stmt = conn.prepareStatement(GetUserIdByUsernameSql)) {
             stmt.setString(1, username);
-            stmt.execute();
-            var rset = stmt.getResultSet();
+
+            var rset = stmt.executeQuery();
             if (!rset.next()){
                 return null;
             }
@@ -82,8 +82,8 @@ public class UserRepository {
             stmt.setString(1, user.getUsername());
             stmt.setBytes(3, salt);
             stmt.setBytes(2, getSha1FromString(user.getPassword(), salt));
-            stmt.execute();
-            var rset = stmt.getResultSet();
+
+            var rset = stmt.executeQuery();
             if (!rset.next()){
                 return null;
             }
