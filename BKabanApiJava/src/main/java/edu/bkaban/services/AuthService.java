@@ -6,7 +6,7 @@ import javax.servlet.http.HttpSession;
 
 @Service
 public class AuthService {
-    private final boolean IsDebug = false;
+    private final boolean IsDebug = true;
     private final String KeyName = "userId";
     private final Integer DebugUserId = 1;
 

@@ -1,12 +1,13 @@
 package edu.bkaban.controllers;
 
-import edu.bkaban.models.task.TaskModel;
-import edu.bkaban.models.task.TaskModelColumnLink;
-import edu.bkaban.models.task.TaskModelWithPositionAndNewColumn;
-import edu.bkaban.repositories.TaskRepository;
+import edu.bkaban.models.column.ColumnModel;
+import edu.bkaban.models.column.ColumnModelBoardLink;
+import edu.bkaban.models.column.ColumnModelWithPosition;
+import edu.bkaban.repositories.ColumnRepository;
 import edu.bkaban.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,62 +16,64 @@ import javax.validation.Valid;
 import java.sql.SQLException;
 
 @RestController
-@RequestMapping("/api/task")
-public class TaskController {
-
-    @Autowired
-    private TaskRepository _taskRepository;
+@RequestMapping("/api/column")
+public class ColumnController {
 
     @Autowired
     private AuthService _authService;
 
-    @PostMapping
-    private ResponseEntity createTask(@Valid @RequestBody TaskModelColumnLink task, HttpSession session) throws SQLException {
+    @Autowired
+    private ColumnRepository _columnRepository;
+
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    private ResponseEntity createColumn(@Valid @RequestBody ColumnModelBoardLink column, HttpSession session) throws SQLException {
         Integer userId;
         if ((userId = _authService.getUserId(session)) == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
 
-        Integer taskId = _taskRepository.createTask(userId, task);
-        if (taskId == null) {
+        Integer columnId = _columnRepository.createColumn(userId, column);
+        if (columnId == null) {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
 
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.ok().body("{ \"id\": " + columnId + " }");
     }
 
     @PutMapping
-    private ResponseEntity updateTask(@Valid @RequestBody TaskModel task, HttpSession session) throws SQLException {
+    private ResponseEntity updateColumn(@Valid @RequestBody ColumnModel column, HttpSession session) throws SQLException {
         Integer userId;
         if ((userId = _authService.getUserId(session)) == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
 
-        if (task.getId() == null || task.getName() == null && task.getDescription() == null) {
+        if (column.getId() == null) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
 
-        boolean isOk = _taskRepository.updateTask(userId, task);
-        if (isOk) {
+        boolean result = _columnRepository.updateColumn(userId, column);
+
+        if (result) {
             return new ResponseEntity(HttpStatus.OK);
         }
 
         return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
 
-    @PutMapping("/reorder")
-    private ResponseEntity moveTask(@Valid @RequestBody TaskModelWithPositionAndNewColumn task, HttpSession session) throws  SQLException {
+    @PutMapping("reorder")
+    private ResponseEntity moveColumn(@Valid @RequestBody ColumnModelWithPosition column, HttpSession session) throws SQLException {
         Integer userId;
         if ((userId = _authService.getUserId(session)) == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
 
-        if (task.getId() == null) {
+        if (column.getId() == null) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
 
-        boolean isOk = _taskRepository.updateTaskPositionAndColumn(userId, task);
-        if (isOk) {
+        boolean result = _columnRepository.updateColumnPosition(userId, column);
+
+        if (result) {
             return new ResponseEntity(HttpStatus.OK);
         }
 
@@ -78,17 +81,19 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity deleteTask(@PathVariable int id, HttpSession session) throws SQLException {
+    private ResponseEntity deleteColumn(@PathVariable int id, HttpSession session) throws SQLException {
         Integer userId;
         if ((userId = _authService.getUserId(session)) == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
 
-        boolean isOk = _taskRepository.deleteTask(userId, id);
-        if (isOk) {
+        boolean result = _columnRepository.deleteColumn(userId, id);
+
+        if (result) {
             return new ResponseEntity(HttpStatus.OK);
         }
 
         return new ResponseEntity(HttpStatus.FORBIDDEN);
     }
+
 }

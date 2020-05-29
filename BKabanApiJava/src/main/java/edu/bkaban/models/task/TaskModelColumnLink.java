@@ -1,4 +1,4 @@
-package edu.bkaban.models;
+package edu.bkaban.models.task;
 
 import javax.validation.constraints.NotNull;
 

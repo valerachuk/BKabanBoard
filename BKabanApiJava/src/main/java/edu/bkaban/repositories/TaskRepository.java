@@ -1,8 +1,8 @@
 package edu.bkaban.repositories;
 
-import edu.bkaban.models.TaskModel;
-import edu.bkaban.models.TaskModelColumnLink;
-import edu.bkaban.models.TaskModelWithPositionAndNewColumn;
+import edu.bkaban.models.task.TaskModel;
+import edu.bkaban.models.task.TaskModelColumnLink;
+import edu.bkaban.models.task.TaskModelWithPositionAndNewColumn;
 import edu.bkaban.services.DbService;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +24,7 @@ public class TaskRepository {
             stmt.setInt(1, userId);
             stmt.setInt(2, TaskId);
 
-            var rset = stmt.executeQuery();
-            return rset.next();
+            return stmt.executeQuery().next();
         }
     }
 
@@ -38,7 +37,7 @@ public class TaskRepository {
     private static int getTaskCount(Connection conn, int columnId) throws SQLException {
         try (var stmt = conn.prepareStatement(getTaskCountSql)) {
             stmt.setInt(1, columnId);
-            stmt.execute();
+
             var rset = stmt.executeQuery();
             rset.next();
             return rset.getInt(1);
@@ -52,7 +51,6 @@ public class TaskRepository {
 
     public Integer createTask(int userId, TaskModelColumnLink task) throws SQLException {
         try (var conn = DbService.getConnection(); var stmt = conn.prepareStatement(createTaskSql)) {
-
             if (!ColumnRepository.isAllowed(conn, userId, task.getColumnId())) {
                 return null;
             }
@@ -61,6 +59,7 @@ public class TaskRepository {
             stmt.setString(2, task.getDescription());
             stmt.setInt(3, task.getColumnId());
             stmt.setInt(4, getTaskCount(conn, task.getColumnId()));
+
             var rset = stmt.executeQuery();
             if (!rset.next()) {
                 return null;
@@ -83,7 +82,6 @@ public class TaskRepository {
             if (!isAllowed(conn, userId, task.getId())) {
                 return false;
             }
-
             return stmt.executeQuery().next();
         }
     }
