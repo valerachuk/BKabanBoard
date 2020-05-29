@@ -95,7 +95,7 @@ namespace BKabanApi.Models.DB
                 return false;
             }
 
-            int maxColumnPosition = GetColumnsCount(db, (int)boardId);
+            int maxColumnPosition = GetColumnsCount(db, (int) boardId) - 1;
 
             if (column.Position < 0 || column.Position > maxColumnPosition)
             {

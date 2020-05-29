@@ -129,7 +129,7 @@ public class ColumnRepository {
 
             int boardId = boardIdRset.getInt(1);
 
-            int maxColumnPosition = getColumnsCount(conn, boardId);
+            int maxColumnPosition = getColumnsCount(conn, boardId) - 1;
 
             if (column.getPosition() < 0 || column.getPosition() > maxColumnPosition) {
                 return false;
