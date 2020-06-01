@@ -70,9 +70,9 @@ public class TaskRepository {
 
     private String updateTaskSql(TaskModel task) {
         return "UPDATE TaskTable SET\n" +
-                (task.getName() != null ? ("Name = '" + task.getName() + "'") : "") +
+                (task.getName() != null ? ("Name = N'" + task.getName() + "'") : "") +
                 (task.getName() != null && task.getDescription() != null ? ",\n" : "") +
-                (task.getDescription() != null ? ("Description = '" + task.getDescription() + "'\n") : "") +
+                (task.getDescription() != null ? ("Description = N'" + task.getDescription() + "'\n") : "") +
                 "OUTPUT DELETED.Id\n" +
                 "WHERE Id = " + task.getId();
     }

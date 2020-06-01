@@ -22,7 +22,8 @@ public class BKabanBoardApplication {
 						.allowCredentials(true)
 						.allowedHeaders("*")
 						.allowedMethods("*")
-                        .allowedOrigins("http://localhost");
+                        .allowedOrigins("https://jkban.tk");
+//                        .allowedOrigins("http://localhost");
             }
         };
     }

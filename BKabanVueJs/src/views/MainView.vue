@@ -18,7 +18,7 @@
             <input type="text" placeholder="+ Add another board" class="add-new-board" v-model="newBoardName" @change="createBoard" @keyup.enter="createBoard">
         </div>
         <Board class="board-wrapper" :board="currentBoard"/>
-        <TaskEditModal v-if="modalTaskObj" :task="modalTaskObj" @close-modal-task="modalTaskObj = null" />
+        <TaskEditModal v-if="modalTaskObj" :column="modalTaskObj.column" :task="modalTaskObj.task" @close-modal-task="modalTaskObj = null" />
     </div>
 </template>
 

@@ -8,7 +8,7 @@
                 <img src="@/assets/icons/title.png" class="title-img">
                 <input type="text" class="input-name" v-model="newName" @change="changeName($event)"
                     @keyup.enter="changeName($event)">
-                <div class="in-column">In column: <span class="column-bold">{{task.colName}}</span></div>
+                <div class="in-column">In column: <span class="column-bold">{{column.name}}</span></div>
             </div>
             <div class="description-wrapper">
                 <img src="@/assets/icons/description.png" class="desc-img">
@@ -29,6 +29,10 @@
         },
         props: {
             task:{
+                type: Object,
+                required: true,
+            },
+            column:{
                 type: Object,
                 required: true,
             }
