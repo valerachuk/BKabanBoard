@@ -1,5 +1,6 @@
 package edu.bkaban.controllers;
 
+import edu.bkaban.models.IdDTO;
 import edu.bkaban.models.task.TaskModel;
 import edu.bkaban.models.task.TaskModelColumnLink;
 import edu.bkaban.models.task.TaskModelWithPositionAndNewColumn;
@@ -25,7 +26,7 @@ public class TaskController {
     @Autowired
     private AuthService _authService;
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     private ResponseEntity createTask(@Valid @RequestBody TaskModelColumnLink task, HttpSession session) throws SQLException {
         Integer userId;
         if ((userId = _authService.getUserId(session)) == null) {
@@ -37,7 +38,7 @@ public class TaskController {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
 
-        return ResponseEntity.ok("{ \"id\": " + taskId + " }");
+        return ResponseEntity.ok(new IdDTO(taskId));
     }
 
     @PutMapping

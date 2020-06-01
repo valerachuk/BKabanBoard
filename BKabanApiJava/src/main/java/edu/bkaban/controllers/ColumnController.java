@@ -1,5 +1,6 @@
 package edu.bkaban.controllers;
 
+import edu.bkaban.models.IdDTO;
 import edu.bkaban.models.column.ColumnModel;
 import edu.bkaban.models.column.ColumnModelBoardLink;
 import edu.bkaban.models.column.ColumnModelWithPosition;
@@ -25,7 +26,7 @@ public class ColumnController {
     @Autowired
     private ColumnRepository _columnRepository;
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     private ResponseEntity createColumn(@Valid @RequestBody ColumnModelBoardLink column, HttpSession session) throws SQLException {
         Integer userId;
         if ((userId = _authService.getUserId(session)) == null) {
@@ -37,7 +38,7 @@ public class ColumnController {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
 
-        return ResponseEntity.ok().body("{ \"id\": " + columnId + " }");
+        return ResponseEntity.ok().body(new IdDTO(columnId));
     }
 
     @PutMapping

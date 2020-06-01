@@ -1,5 +1,6 @@
 package edu.bkaban.controllers;
 
+import edu.bkaban.models.IdDTO;
 import edu.bkaban.models.board.BoardModel;
 import edu.bkaban.models.board.BoardModelWithPosition;
 import edu.bkaban.repositories.BoardRepository;
@@ -24,7 +25,7 @@ public class BoardController {
     @Autowired
     private BoardRepository _boardRepository;
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     private ResponseEntity createBoard(@Valid @RequestBody BoardModel board, HttpSession session) throws SQLException {
         Integer userId;
         if ((userId = _authService.getUserId(session)) == null) {
@@ -37,7 +38,7 @@ public class BoardController {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
 
-        return ResponseEntity.ok("{ \"id\": " + boardId + " }");
+        return ResponseEntity.ok(new IdDTO(boardId));
     }
 
     @GetMapping("/{id}")
