@@ -24,8 +24,8 @@ public class BoardController {
     @Autowired
     private BoardRepository _boardRepository;
 
-    @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity CreateBoard(@Valid @RequestBody BoardModel board, HttpSession session) throws SQLException {
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    private ResponseEntity createBoard(@Valid @RequestBody BoardModel board, HttpSession session) throws SQLException {
         Integer userId;
         if ((userId = _authService.getUserId(session)) == null) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);

@@ -8,7 +8,7 @@
                 <img src="@/assets/icons/title.png" class="title-img">
                 <input type="text" class="input-name" v-model="newName" @change="changeName($event)"
                     @keyup.enter="changeName($event)">
-                <div class="in-column">In column: <span class="column-bold">Smth1</span></div>
+                <div class="in-column">In column: <span class="column-bold">{{task.colName}}</span></div>
             </div>
             <div class="description-wrapper">
                 <img src="@/assets/icons/description.png" class="desc-img">
@@ -53,10 +53,11 @@
                 apiClient.updateTask({id: this.task.id, name:this.task.name});
             },
             changeDescription(e){
-                
-                if (this.newDescription.length > 1000 && confirm('Description length is more than 1000 caracters! Do you want to cut?')) {
-                    this.newDescription = this.newDescription.slice(0, 1000);
+                if (this.newDescription.length > 1000) {
+                    prompt('Description length is more than 1000 caracters! It will be trimmed, you can copy it from here', this.newDescription);
                 }
+
+                this.newDescription = this.newDescription.slice(0, 1000);
                 
                 e.target.blur();
                 

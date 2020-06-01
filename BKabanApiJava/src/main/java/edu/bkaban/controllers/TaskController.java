@@ -7,6 +7,7 @@ import edu.bkaban.repositories.TaskRepository;
 import edu.bkaban.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class TaskController {
     @Autowired
     private AuthService _authService;
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity createTask(@Valid @RequestBody TaskModelColumnLink task, HttpSession session) throws SQLException {
         Integer userId;
         if ((userId = _authService.getUserId(session)) == null) {
@@ -36,7 +37,7 @@ public class TaskController {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
 
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.ok("{ \"id\": " + taskId + " }");
     }
 
     @PutMapping

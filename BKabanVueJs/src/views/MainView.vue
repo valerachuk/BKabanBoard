@@ -14,8 +14,8 @@
                         {{board.name}}
                     </div>
                 </div>
-                <input type="text" placeholder="+ Add another board" class="add-new-board" v-model="newBoardName" @change="createBoard" @keyup.enter="createBoard">
             </draggable>
+            <input type="text" placeholder="+ Add another board" class="add-new-board" v-model="newBoardName" @change="createBoard" @keyup.enter="createBoard">
         </div>
         <Board class="board-wrapper" :board="currentBoard"/>
         <TaskEditModal v-if="modalTaskObj" :task="modalTaskObj" @close-modal-task="modalTaskObj = null" />
@@ -131,7 +131,7 @@
 
     .board-list-wrapper{
         background-color: #0079BF;
-        padding: 8px;
+        padding: 8px 8px 0;
         color: white;
     }
 
@@ -195,6 +195,7 @@
         color: white;
         font-size: 16px;
         cursor: pointer;
+        padding: 0 8px 8px;
     }
 
     .add-new-board:focus{

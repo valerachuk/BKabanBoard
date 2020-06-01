@@ -50,7 +50,7 @@
                     return;
                 }
 
-                eventBus.$emit('open-modal-task', this.task);
+                eventBus.$emit('open-modal-task', Object.assign({}, this.task, {colName: this.column.name}));
             }
         },
     }
