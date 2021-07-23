@@ -20,7 +20,7 @@ Client was implemented on Vue.js; Server - on ASP.NET Core and Spring Boot.
 
 ## Demo
 
-[![Watch the video](./img/videoPreview.png)](https://youtu.be/ouE86FlNc2k)
+[<img src="./img/videoPreview.png" width="550px" alt="Watch the video"/>](https://youtu.be/ouE86FlNc2k)
 
 ASP.NET Core backend: [kban.tk](https://kban.tk/).
 
@@ -71,7 +71,7 @@ Please use Firefox. Doesn't work on chrome
 
 ### Sign in
 
-![Sign in form](./img/signInForm.png)
+<img src="./img/signInForm.png" width="450px" alt="Sign in form"/>
 
 1. Username field
 2. Password field
@@ -114,7 +114,7 @@ Please use Firefox. Doesn't work on chrome
 
 ### Task edit
 
-![Task edit form](./img/taskEditForm.png)
+<img src="./img/taskEditForm.png" width="600px" alt="Task edit form"/>
 
 1. Name of the task. Click to edit
 2. Column name where task is located.
