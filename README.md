@@ -54,8 +54,9 @@ Please use Firefox. Doesn't work on chrome
 
 - ### Back-end
   - [ASP.NET Core](https://github.com/dotnet/aspnetcore) Web API
-  - [Dapper](https://github.com/DapperLib/Dapper)
+  - [Dapper](https://github.com/DapperLib/Dapper) (to perform raw sql queries)
   - [Spring boot](https://github.com/spring-projects/spring-boot) (I also decided to implement back-end in java)
+  - [Ms Sql server](https://www.microsoft.com/en-us/sql-server)
 - ### Front-end
   - [Vue.js](https://github.com/vuejs/vue) 2
   - [axios](https://github.com/axios/axios) used for http requests
