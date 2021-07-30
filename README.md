@@ -22,12 +22,6 @@ Client was implemented on Vue.js; Server - on ASP.NET Core and Spring Boot.
 
 [<img src="./img/videoPreview.png" width="550px" alt="Watch the video"/>](https://youtu.be/ouE86FlNc2k)
 
-ASP.NET Core backend: [kban.tk](https://kban.tk/).
-
-Spring boot backend: [jkban.tk](https://jkban.tk/#/).
-
-Please use Firefox. Doesn't work on chrome
-
 ## Main Features
 
 - Registration
